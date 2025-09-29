@@ -56,6 +56,42 @@ body {
     font-weight: bold;
 }
 
+/* -- Style untuk Tombol Favorit -- */
+.favorite-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 28px;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+    z-index: 10;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+}
+
+.food-card:hover .favorite-btn {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.favorite-btn:hover {
+    transform: scale(1.2);
+}
+
+/* Style saat tombol favorit aktif (diklik) */
+.favorite-btn.favorited {
+    color: #ff8cdb; 
+    opacity: 1 ;
+    visibility: visible;
+    transform: scale(1);
+}
+
 /*untuk peletakan search bar*/
 .search-container {
     display: flex;
@@ -118,6 +154,7 @@ body {
 
 /*design dalam kotak makan*/
 .food-card {
+    position: relative;
     max-width: 500px;
     margin: 0 auto;
     border-radius: 15px;

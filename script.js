@@ -385,6 +385,28 @@ const foods = [
     }
 ];
 
+// Fungsi untuk mengambil data favorit dari localStorage
+function getFavorites() {
+    const favorites = localStorage.getItem('favoriteFoods');
+    return favorites ? JSON.parse(favorites) : [];
+}
+
+// Fungsi untuk menyimpan data favorit ke localStorage
+function saveFavorites(favorites) {
+    localStorage.setItem('favoriteFoods', JSON.stringify(favorites));
+}
+
+// Fungsi untuk menambah atau menghapus makanan dari daftar favorit
+function toggleFavorite(foodName) {
+    let favorites = getFavorites();
+    if (favorites.includes(foodName)) {
+        favorites = favorites.filter(name => name !== foodName);
+    } else {
+        favorites.push(foodName);
+    }
+    saveFavorites(favorites);
+}
+
 // State untuk menyimpan data yang sedang ditampilkan
 let displayedFoods = foods;
 let currentPage = 1;
@@ -392,8 +414,13 @@ const itemsPerPage = 6;
 
 // Fungsi untuk membuat card makanan
 function createFoodCard(food) {
+    const favorites = getFavorites();
+    const isFavorited = favorites.includes(food.name);
+    const favoritedClass = isFavorited ? 'favorited' : '';
+
     return `
         <div class="food-card" data-category="${food.category}" data-name="${food.name}">
+            <span class="favorite-btn ${favoritedClass}" title="Tambahkan ke favorit">♥</span>
             <div class="food-image" style="background-image: url('${food.image}')"></div>
             <div class="food-content">
                 <h3 class="food-title">${food.name}</h3>
@@ -404,18 +431,31 @@ function createFoodCard(food) {
     `;
 }
 
+
 // Fungsi untuk menampilkan makanan di grid
 function displayFoods() {
     const foodGrid = document.getElementById('foodGrid');
-    foodGrid.innerHTML = '';
+    foodGrid.innerHTML = ''; 
 
-    // Logika untuk memotong data sesuai halaman
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const paginatedItems = displayedFoods.slice(startIndex, endIndex);
 
     const foodCards = paginatedItems.map(createFoodCard).join('');
     foodGrid.innerHTML = foodCards;
+
+    // Tambahkan event listener untuk tombol favorit
+    const favoriteButtons = foodGrid.querySelectorAll('.favorite-btn');
+    favoriteButtons.forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            event.stopPropagation(); 
+            const card = btn.closest('.food-card');
+            const foodName = card.dataset.name;
+            
+            toggleFavorite(foodName);
+            btn.classList.toggle('favorited'); 
+        });
+    });
 
     // Tambahkan event listener untuk setiap card
     const cards = foodGrid.querySelectorAll('.food-card');
@@ -437,21 +477,20 @@ function setupPagination() {
 
     const pageCount = Math.ceil(displayedFoods.length / itemsPerPage);
 
+    if (pageCount <= 1) return;
+
     for (let i = 1; i <= pageCount; i++) {
         const btn = document.createElement('button');
         btn.classList.add('page-btn');
         btn.innerText = i;
-
         if (i === currentPage) {
             btn.classList.add('active');
         }
-
         btn.addEventListener('click', () => {
             currentPage = i;
             displayFoods();
             window.scrollTo(0, 0);
         });
-
         paginationContainer.appendChild(btn);
     }
 }
@@ -460,6 +499,9 @@ function setupPagination() {
 function filterByCategory(category) {
     if (category === 'all') {
         displayedFoods = foods;
+    } else if (category === 'favorit') {
+        const favoriteNames = getFavorites();
+        displayedFoods = foods.filter(food => favoriteNames.includes(food.name));
     } else {
         displayedFoods = foods.filter(food => food.category === category);
     }
@@ -501,6 +543,10 @@ function showFoodModal(food) {
     modal.style.display = 'block';
 }
 
+function closeModal() {
+    document.getElementById('foodModal').style.display = 'none';
+}
+
 // Fungsi untuk menutup modal
 function closeModal() {
     document.getElementById('foodModal').style.display = 'none';
@@ -508,7 +554,6 @@ function closeModal() {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
-    // Tampilkan semua makanan saat pertama kali load
     displayFoods();
 
     // Event listener untuk tombol filter
