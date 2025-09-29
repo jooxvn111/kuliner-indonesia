@@ -388,7 +388,7 @@ const foods = [
 // State untuk menyimpan data yang sedang ditampilkan
 let displayedFoods = foods;
 let currentPage = 1;
-const itemsPerPage = 6; // Menetapkan 6 item per halaman
+const itemsPerPage = 6;
 
 // Fungsi untuk membuat card makanan
 function createFoodCard(food) {
@@ -404,10 +404,10 @@ function createFoodCard(food) {
     `;
 }
 
-// Fungsi untuk menampilkan makanan di grid (SUDAH DIMODIFIKASI)
+// Fungsi untuk menampilkan makanan di grid
 function displayFoods() {
     const foodGrid = document.getElementById('foodGrid');
-    foodGrid.innerHTML = ''; // Kosongkan grid terlebih dahulu
+    foodGrid.innerHTML = '';
 
     // Logika untuk memotong data sesuai halaman
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -427,14 +427,13 @@ function displayFoods() {
         });
     });
 
-    // Panggil fungsi untuk membuat tombol halaman
     setupPagination();
 }
 
-// FUNGSI BARU: untuk membuat tombol-tombol halaman
+//untuk membuat tombol-tombol halaman
 function setupPagination() {
     const paginationContainer = document.getElementById('paginationContainer');
-    paginationContainer.innerHTML = ''; // Kosongkan tombol halaman sebelumnya
+    paginationContainer.innerHTML = '';
 
     const pageCount = Math.ceil(displayedFoods.length / itemsPerPage);
 
@@ -450,25 +449,25 @@ function setupPagination() {
         btn.addEventListener('click', () => {
             currentPage = i;
             displayFoods();
-            window.scrollTo(0, 0); // Gulir ke atas halaman saat pindah halaman
+            window.scrollTo(0, 0);
         });
 
         paginationContainer.appendChild(btn);
     }
 }
 
-// Fungsi untuk filter berdasarkan kategori (SUDAH DIMODIFIKASI)
+// Fungsi untuk filter berdasarkan kategori
 function filterByCategory(category) {
     if (category === 'all') {
         displayedFoods = foods;
     } else {
         displayedFoods = foods.filter(food => food.category === category);
     }
-    currentPage = 1; // Selalu kembali ke halaman 1 setelah filter
+    currentPage = 1;
     displayFoods();
 }
 
-// Fungsi untuk pencarian (SUDAH DIMODIFIKASI)
+// Fungsi untuk pencarian
 function searchFoods(searchTerm) {
     const term = searchTerm.toLowerCase();
 
@@ -478,10 +477,9 @@ function searchFoods(searchTerm) {
             food.origin.toLowerCase().includes(term)
         );
     } else {
-        // Jika kotak pencarian kosong, kembalikan ke daftar lengkap
         displayedFoods = foods;
     }
-    currentPage = 1; // Selalu kembali ke halaman 1 setelah mencari
+    currentPage = 1;
     displayFoods();
 }
 
