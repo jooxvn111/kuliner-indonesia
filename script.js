@@ -197,6 +197,7 @@ const foods = [
         origin: "Jawa",
         category: "jawa",
         image: "media/nasi goreng.jpg",
+        description: "Hidangan nasi yang digoreng dengan bumbu rempah khas Jawa.",
         fullDescription: "Nasi Goreng adalah hidangan nasi yang digoreng dengan bumbu rempah khas Indonesia seperti bawang putih, bawang merah, cabai, dan kecap manis. Meskipun populer di seluruh Indonesia, nasi goreng memiliki akar kuat di Jawa, terutama di daerah Jawa Tengah dan Jawa Timur. Hidangan ini telah diakui sebagai salah satu makanan terenak dunia dan menjadi hidangan nasional Indonesia yang paling dikenal di mancanegara."
     },
     {
