@@ -146,19 +146,18 @@ body {
 .food-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
+    justify-content: center;
+    gap: 20px;
 }
 
 /*design dalam kotak makan*/
 .food-card {
-    background: white;
-    border-radius: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    transition: all 0.3s ease;
-    border: 2px solid rgba(255, 182, 182, 0.3);
-    cursor: pointer;
+    background: #fff;
 }
 
 /*efek pada saat di lewati*/
@@ -200,6 +199,30 @@ body {
     line-height: 1.6;
     font-size: 15px;
 }
+
+.food-card img {
+    width: 100%;
+    height: 0;
+    padding-top: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    position: absolute;
+}
+
+.img-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 15px 15px 0 0;
+}
+
+.img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 
 /*untuk deskripsi makanan pada saat di click terutama background belakang*/
 .modal {
@@ -257,6 +280,19 @@ body {
     font-size: 17px;
 }
 
+@supports not (aspect-ratio: 1 / 1) {
+    .img-wrapper {
+        position: relative;
+        padding-top: 100%;
+    }
+    .img-wrapper img {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
 
 @media (max-width: 768px) {
     .container {
