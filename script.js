@@ -386,63 +386,102 @@ const foods = [
 ];
 
 // State untuk menyimpan data yang sedang ditampilkan
-let currentCategory = 'all';
 let displayedFoods = foods;
+let currentPage = 1;
+const itemsPerPage = 6; // Menetapkan 6 item per halaman
 
 // Fungsi untuk membuat card makanan
 function createFoodCard(food) {
     return `
-        <div class="food-card" data-category="${food.category}">
+        <div class="food-card" data-category="${food.category}" data-name="${food.name}">
             <div class="food-image" style="background-image: url('${food.image}')"></div>
             <div class="food-content">
                 <h3 class="food-title">${food.name}</h3>
                 <p class="food-origin">📍 ${food.origin}</p>
-                <p class="food-description">${food.description}</p>
+                <p class="food-description">${food.description || 'Klik untuk deskripsi lengkap.'}</p>
             </div>
         </div>
     `;
 }
 
-// Fungsi untuk menampilkan makanan di grid
+// Fungsi untuk menampilkan makanan di grid (SUDAH DIMODIFIKASI)
 function displayFoods() {
     const foodGrid = document.getElementById('foodGrid');
-    const foodCards = displayedFoods.map(createFoodCard).join('');
+    foodGrid.innerHTML = ''; // Kosongkan grid terlebih dahulu
+
+    // Logika untuk memotong data sesuai halaman
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedItems = displayedFoods.slice(startIndex, endIndex);
+
+    const foodCards = paginatedItems.map(createFoodCard).join('');
     foodGrid.innerHTML = foodCards;
 
     // Tambahkan event listener untuk setiap card
     const cards = foodGrid.querySelectorAll('.food-card');
-    cards.forEach((card, index) => {
+    cards.forEach(card => {
         card.addEventListener('click', () => {
-            showFoodModal(displayedFoods[index]);
+            const foodName = card.dataset.name;
+            const foodData = foods.find(f => f.name === foodName);
+            showFoodModal(foodData);
         });
     });
+
+    // Panggil fungsi untuk membuat tombol halaman
+    setupPagination();
 }
 
-// Fungsi untuk filter berdasarkan kategori
+// FUNGSI BARU: untuk membuat tombol-tombol halaman
+function setupPagination() {
+    const paginationContainer = document.getElementById('paginationContainer');
+    paginationContainer.innerHTML = ''; // Kosongkan tombol halaman sebelumnya
+
+    const pageCount = Math.ceil(displayedFoods.length / itemsPerPage);
+
+    for (let i = 1; i <= pageCount; i++) {
+        const btn = document.createElement('button');
+        btn.classList.add('page-btn');
+        btn.innerText = i;
+
+        if (i === currentPage) {
+            btn.classList.add('active');
+        }
+
+        btn.addEventListener('click', () => {
+            currentPage = i;
+            displayFoods();
+            window.scrollTo(0, 0); // Gulir ke atas halaman saat pindah halaman
+        });
+
+        paginationContainer.appendChild(btn);
+    }
+}
+
+// Fungsi untuk filter berdasarkan kategori (SUDAH DIMODIFIKASI)
 function filterByCategory(category) {
-    currentCategory = category;
-    
     if (category === 'all') {
         displayedFoods = foods;
     } else {
         displayedFoods = foods.filter(food => food.category === category);
     }
-    
+    currentPage = 1; // Selalu kembali ke halaman 1 setelah filter
     displayFoods();
 }
 
-// Fungsi untuk pencarian
+// Fungsi untuk pencarian (SUDAH DIMODIFIKASI)
 function searchFoods(searchTerm) {
     const term = searchTerm.toLowerCase();
-    
+
     if (term) {
-        displayedFoods = foods.filter(foods => 
-            foods.name.toLowerCase().includes(term)
+        displayedFoods = foods.filter(food =>
+            food.name.toLowerCase().includes(term) ||
+            food.origin.toLowerCase().includes(term)
         );
     } else {
+        // Jika kotak pencarian kosong, kembalikan ke daftar lengkap
         displayedFoods = foods;
     }
-    
+    currentPage = 1; // Selalu kembali ke halaman 1 setelah mencari
     displayFoods();
 }
 
@@ -451,7 +490,7 @@ function showFoodModal(food) {
     const modal = document.getElementById('foodModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
-    
+
     modalTitle.textContent = food.name;
     modalBody.innerHTML = `
         <p><strong>📍 Asal Daerah:</strong> ${food.origin}</p>
@@ -460,7 +499,7 @@ function showFoodModal(food) {
         <br>
         <p><em>Hidangan ini merupakan bagian dari kekayaan kuliner Nusantara yang patut kita lestarikan dan banggakan.</em></p>
     `;
-    
+
     modal.style.display = 'block';
 }
 
@@ -473,30 +512,31 @@ function closeModal() {
 document.addEventListener('DOMContentLoaded', function() {
     // Tampilkan semua makanan saat pertama kali load
     displayFoods();
-    
+
     // Event listener untuk tombol filter
     const filterButtons = document.querySelectorAll('.filter-btn');
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Hapus class active dari semua tombol
             filterButtons.forEach(btn => btn.classList.remove('active'));
-            // Tambah class active ke tombol yang diklik
             this.classList.add('active');
-            
-            // Filter makanan berdasarkan kategori
             const category = this.dataset.category;
             filterByCategory(category);
         });
     });
-    
+
     // Event listener untuk search box
     const searchBox = document.getElementById('searchBox');
     searchBox.addEventListener('input', function() {
         searchFoods(this.value);
     });
-    
+
     // Event listener untuk menutup modal
     const closeBtn = document.querySelector('.close');
     closeBtn.addEventListener('click', closeModal);
-    
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('foodModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    });
 });
