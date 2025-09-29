@@ -384,3 +384,119 @@ const foods = [
         fullDescription: "Sambal Pecel adalah sambal tradisional Indonesia yang terbuat dari kacang tanah, gula kelapa, cabai, bawang merah, bawang putih, daun jeruk, dan berbagai rempah lainnya yang dihaluskan hingga tercampur dan bertekstur kental. Sambal pecel menjadi bagian penting dari hidangan pecel dan banyak dipadukan dengan nasi, lontong, sayuran rebus, dan lauk lainnya dalam berbagai acara di Nusantara."
     }
 ];
+
+// State untuk menyimpan data yang sedang ditampilkan
+let currentCategory = 'all';
+let displayedFoods = foods;
+
+// Fungsi untuk membuat card makanan
+function createFoodCard(food) {
+    return `
+        <div class="food-card" data-category="${food.category}">
+            <div class="food-image" style="background-image: url('${food.image}')"></div>
+            <div class="food-content">
+                <h3 class="food-title">${food.name}</h3>
+                <p class="food-origin">📍 ${food.origin}</p>
+                <p class="food-description">${food.description}</p>
+            </div>
+        </div>
+    `;
+}
+
+// Fungsi untuk menampilkan makanan di grid
+function displayFoods() {
+    const foodGrid = document.getElementById('foodGrid');
+    const foodCards = displayedFoods.map(createFoodCard).join('');
+    foodGrid.innerHTML = foodCards;
+
+    // Tambahkan event listener untuk setiap card
+    const cards = foodGrid.querySelectorAll('.food-card');
+    cards.forEach((card, index) => {
+        card.addEventListener('click', () => {
+            showFoodModal(displayedFoods[index]);
+        });
+    });
+}
+
+// Fungsi untuk filter berdasarkan kategori
+function filterByCategory(category) {
+    currentCategory = category;
+    
+    if (category === 'all') {
+        displayedFoods = foods;
+    } else {
+        displayedFoods = foods.filter(food => food.category === category);
+    }
+    
+    displayFoods();
+}
+
+// Fungsi untuk pencarian
+function searchFoods(searchTerm) {
+    const term = searchTerm.toLowerCase();
+    
+    if (term) {
+        displayedFoods = foods.filter(foods => 
+            foods.name.toLowerCase().includes(term)
+        );
+    } else {
+        displayedFoods = foods;
+    }
+    
+    displayFoods();
+}
+
+// Fungsi untuk menampilkan modal
+function showFoodModal(food) {
+    const modal = document.getElementById('foodModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = food.name;
+    modalBody.innerHTML = `
+        <p><strong>📍 Asal Daerah:</strong> ${food.origin}</p>
+        <br>
+        <p>${food.fullDescription}</p>
+        <br>
+        <p><em>Hidangan ini merupakan bagian dari kekayaan kuliner Nusantara yang patut kita lestarikan dan banggakan.</em></p>
+    `;
+    
+    modal.style.display = 'block';
+}
+
+// Fungsi untuk menutup modal
+function closeModal() {
+    document.getElementById('foodModal').style.display = 'none';
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Tampilkan semua makanan saat pertama kali load
+    displayFoods();
+    
+    // Event listener untuk tombol filter
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Hapus class active dari semua tombol
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            // Tambah class active ke tombol yang diklik
+            this.classList.add('active');
+            
+            // Filter makanan berdasarkan kategori
+            const category = this.dataset.category;
+            filterByCategory(category);
+        });
+    });
+    
+    // Event listener untuk search box
+    const searchBox = document.getElementById('searchBox');
+    searchBox.addEventListener('input', function() {
+        searchFoods(this.value);
+    });
+    
+    // Event listener untuk menutup modal
+    const closeBtn = document.querySelector('.close');
+    closeBtn.addEventListener('click', closeModal);
+    
+});
